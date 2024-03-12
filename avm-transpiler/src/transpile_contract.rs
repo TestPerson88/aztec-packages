@@ -84,7 +84,7 @@ impl From<CompiledAcirContract> for TranspiledContract {
             if function
                 .custom_attributes
                 .contains(&"aztec(public-vm)".to_string())
-                && re.is_match(function.name.as_str())
+            // && re.is_match(function.name.as_str())
             {
                 info!(
                     "Transpiling AVM function {} on contract {}",
@@ -107,6 +107,10 @@ impl From<CompiledAcirContract> for TranspiledContract {
                     debug_symbols: function.debug_symbols,
                 }));
             } else {
+                info!(
+                    "Ignoring AVM function {} on contract {} with attributes {:?}",
+                    function.name, contract.name, function.custom_attributes
+                );
                 // This function is not flagged for transpilation. Push original entry.
                 functions.push(AvmOrAcirContractFunction::Acir(function));
             }

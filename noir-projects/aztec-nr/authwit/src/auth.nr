@@ -1,3 +1,4 @@
+use dep::aztec::context::avm_context::AVMContext;
 use dep::aztec::protocol_types::{
     abis::function_selector::FunctionSelector, address::AztecAddress,
     constants::{GENERATOR_INDEX__AUTHWIT_INNER, GENERATOR_INDEX__AUTHWIT_OUTER},
@@ -19,7 +20,7 @@ pub fn assert_current_call_valid_authwit(context: &mut PrivateContext, on_behalf
 
 // docs:start:assert_current_call_valid_authwit_public
 // Assert that `on_behalf_of` have authorized the current call in a public context
-pub fn assert_current_call_valid_authwit_public(context: &mut PublicContext, on_behalf_of: AztecAddress) {
+pub fn assert_current_call_valid_authwit_public(context: &mut AVMContext, on_behalf_of: AztecAddress) {
     let function_selector = FunctionSelector::from_signature("spend_public_authwit(Field)");
     let inner_hash = compute_inner_authwit_hash([context.msg_sender().to_field(), context.selector().to_field(), context.args_hash]);
     let result = context.call_public_function(on_behalf_of, function_selector, [inner_hash])[0];
@@ -29,7 +30,12 @@ pub fn assert_current_call_valid_authwit_public(context: &mut PublicContext, on_
 
 // docs:start:compute_authwit_message_hash
 // Compute the message hash to be used by an authentication witness 
-pub fn compute_call_authwit_hash<N>(caller: AztecAddress, consumer: AztecAddress, selector: FunctionSelector, args: [Field; N]) -> Field {
+pub fn compute_call_authwit_hash<N>(
+    caller: AztecAddress,
+    consumer: AztecAddress,
+    selector: FunctionSelector,
+    args: [Field; N]
+) -> Field {
     let args_hash = hash_args(args);
     let inner_hash = compute_inner_authwit_hash([caller.to_field(), selector.to_field(), args_hash]);
     compute_outer_authwit_hash(consumer, inner_hash)

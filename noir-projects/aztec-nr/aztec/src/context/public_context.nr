@@ -1,3 +1,8 @@
+use crate::context::avm_context::AVMContext;
+
+type PublicContext = AVMContext;
+
+/*
 use crate::{
     context::{inputs::PublicContextInputs, interface::ContextInterface},
     messaging::process_l1_to_l2_message, oracle::{arguments, public_call::call_public_function_internal}
@@ -293,3 +298,4 @@ impl PublicContext {
         )
     }
 }
+*/

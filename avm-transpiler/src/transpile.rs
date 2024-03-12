@@ -1,3 +1,5 @@
+use log::debug;
+
 use acvm::acir::brillig::Opcode as BrilligOpcode;
 use acvm::acir::circuit::brillig::Brillig;
 
@@ -14,7 +16,9 @@ use crate::utils::{dbg_print_avm_program, dbg_print_brillig_program};
 
 /// Transpile a Brillig program to AVM bytecode
 pub fn brillig_to_avm(brillig: &Brillig) -> Vec<u8> {
-    dbg_print_brillig_program(brillig);
+    // dbg_print_brillig_program(brillig);
+    debug!("\tInputs: {:?}", brillig.inputs);
+    debug!("\tOutputs: {:?}", brillig.outputs);
 
     let mut avm_instrs: Vec<AvmInstruction> = Vec::new();
 
@@ -23,7 +27,10 @@ pub fn brillig_to_avm(brillig: &Brillig) -> Vec<u8> {
     let brillig_pcs_to_avm_pcs = map_brillig_pcs_to_avm_pcs(avm_instrs.len(), brillig);
 
     // Transpile a Brillig instruction to one or more AVM instructions
-    for brillig_instr in &brillig.bytecode {
+    for (i, brillig_instr) in brillig.bytecode.iter().enumerate() {
+        debug!("\tPC:{0} {1:?}", i, brillig_instr);
+        let avm_instrs_size_before = avm_instrs.len();
+
         match brillig_instr {
             BrilligOpcode::BinaryFieldOp {
                 destination,
@@ -239,6 +246,13 @@ pub fn brillig_to_avm(brillig: &Brillig) -> Vec<u8> {
                 brillig_instr
             ),
         }
+
+        avm_instrs
+            .iter()
+            .skip(avm_instrs_size_before)
+            .for_each(|ins| {
+                debug!("-> {:?}", ins);
+            });
     }
 
     dbg_print_avm_program(&avm_instrs);
@@ -313,9 +327,12 @@ fn handle_external_call(
     if destinations.len() != 2 || inputs.len() != 4 {
         panic!(
             "Transpiler expects ForeignCall (Static)Call to have 2 destinations and 4 inputs, got {} and {}.
-            Make sure your call instructions's input/return arrays have static length (`[Field; <size>]`)!",
+            Make sure your call instructions's input/return arrays have static length (`[Field; <size>]`)!\n
+            \tinputs: {:?}\n\tdestinations: {:?}",
             destinations.len(),
-            inputs.len()
+            inputs.len(),
+            inputs,
+            destinations
         );
     }
     let gas_offset_maybe = inputs[0];

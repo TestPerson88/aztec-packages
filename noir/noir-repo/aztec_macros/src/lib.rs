@@ -132,6 +132,7 @@ fn transform_module(
                 is_public = true;
             } else if is_custom_attribute(&secondary_attribute, "aztec(public-vm)") {
                 is_public_vm = true;
+                is_public = true;
             }
         }
 
@@ -144,13 +145,14 @@ fn transform_module(
                 is_initializer,
                 insert_init_check,
                 is_internal,
+                is_public_vm,
             )
             .map_err(|err| (err, crate_graph.root_file_id))?;
             has_transformed_module = true;
-        } else if is_public_vm {
-            transform_vm_function(func, storage_defined)
-                .map_err(|err| (err, crate_graph.root_file_id))?;
-            has_transformed_module = true;
+        // } else if is_public_vm {
+        //     transform_vm_function(func, storage_defined)
+        //         .map_err(|err| (err, crate_graph.root_file_id))?;
+        //     has_transformed_module = true;
         } else if storage_defined && func.def.is_unconstrained {
             transform_unconstrained(func);
             has_transformed_module = true;

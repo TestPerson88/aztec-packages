@@ -113,6 +113,11 @@ impl ContextInterface for PrivateContext {
         self.new_nullifiers.push(side_effect);
         self.side_effect_counter = self.side_effect_counter + 1;
     }
+
+    fn nullifier_exists(self, nullifier: Field) -> u8 {
+        assert(false, "'nullifier_exists' not implemented!");
+        0
+    }
 }
 
 impl PrivateContext {

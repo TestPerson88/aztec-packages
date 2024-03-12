@@ -17,7 +17,8 @@ pub fn mark_as_initialized<TContext>(context: &mut TContext) where TContext: Con
 
 pub fn assert_is_initialized<TContext>(context: &mut TContext) where TContext: ContextInterface {
     let init_nullifier = compute_contract_initialization_nullifier(*context);
-    prove_nullifier_inclusion(init_nullifier, *context);
+    // prove_nullifier_inclusion(init_nullifier, *context);
+    assert((*context).nullifier_exists(init_nullifier) == 1);
 }
 
 pub fn compute_contract_initialization_nullifier<TContext>(context: TContext) -> Field where TContext: ContextInterface {

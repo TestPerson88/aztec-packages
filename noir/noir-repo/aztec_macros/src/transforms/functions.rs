@@ -31,8 +31,10 @@ pub fn transform_function(
     is_initializer: bool,
     insert_init_check: bool,
     is_internal: bool,
+    is_public_vm: bool,
 ) -> Result<(), AztecMacroError> {
-    let context_name = format!("{}Context", ty);
+    let context_name =
+        if is_public_vm { "AVMContext".to_string() } else { format!("{}Context", ty) };
     let inputs_name = format!("{}ContextInputs", ty);
     let return_type_name = format!("{}CircuitPublicInputs", ty);
 
@@ -56,7 +58,11 @@ pub fn transform_function(
 
     // Add access to the storage struct
     if storage_defined {
-        let storage_def = abstract_storage(&ty.to_lowercase(), false);
+        let storage_def = if is_public_vm {
+            abstract_storage("public", true)
+        } else {
+            abstract_storage(&ty.to_lowercase(), false)
+        };
         func.def.body.0.insert(0, storage_def);
     }
 
@@ -122,7 +128,7 @@ pub fn transform_vm_function(
 
     // NOTE: the line below is a temporary hack to trigger external transpilation tools
     // It will be removed once the transpiler is integrated into the Noir compiler
-    func.def.name.0.contents = format!("avm_{}", func.def.name.0.contents);
+    // func.def.name.0.contents = format!("avm_{}", func.def.name.0.contents);
     Ok(())
 }
 

@@ -1,25 +1,4 @@
-use dep::aztec::protocol_types::traits::{Serialize, Deserialize};
-
-struct Note {
-    a: Field,
-    b: Field,
-}
-
-impl Serialize<2> for Note {
-    fn serialize(self) -> [Field; 2] {
-        [self.a, self.b]
-    }
-}
-
-impl Deserialize<2> for Note {
-    fn deserialize(wire: [Field; 2]) -> Note {
-        Note {a: wire[0], b: wire[1]}
-    }
-}
-
 contract AvmTest {
-    use crate::Note;
-
     // Libs
     use dep::aztec::prelude::Map;
     use dep::aztec::state_vars::PublicMutable;
