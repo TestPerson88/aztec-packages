@@ -1,4 +1,3 @@
-import { siloNullifier } from '@aztec/circuits.js/hash';
 import { Fr } from '@aztec/foundation/fields';
 
 import type { CommitmentsDB } from '../../index.js';
@@ -49,8 +48,8 @@ export class Nullifiers {
     // If the value is found in the database, it will be associated with a leaf index!
     let leafIndex: bigint | undefined = undefined;
     if (!existsAsPending) {
-      // silo the nullifier before checking for its existence in the host
-      leafIndex = await this.hostNullifiers.getNullifierIndex(siloNullifier(storageAddress, nullifier));
+      // We don't silo the nullifier here as we expect it to be siloed when passed into checkExists.
+      leafIndex = await this.hostNullifiers.getNullifierIndex(nullifier);
     }
     const exists = existsAsPending || leafIndex !== undefined;
     leafIndex = leafIndex === undefined ? BigInt(0) : leafIndex;

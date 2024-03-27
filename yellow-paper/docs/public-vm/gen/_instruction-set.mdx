@@ -1463,7 +1463,7 @@ Check whether a nullifier exists in the nullifier tree (including nullifiers fro
 - **Flags**: 
 	- **indirect**: Toggles whether each memory-offset argument is an indirect offset. Rightmost bit corresponds to 0th offset arg, etc. Indirect offsets result in memory accesses like `M[M[offset]]` instead of the more standard `M[offset]`.
 - **Args**: 
-	- **nullifierOffset**: memory offset of the unsiloed nullifier
+	- **nullifierOffset**: memory offset of the nullifier
 	- **existsOffset**: memory offset specifying where to store operation's result (whether the nullifier exists)
 - **Expression**: 
 <CodeBlock language="jsx">
@@ -1472,6 +1472,7 @@ Check whether a nullifier exists in the nullifier tree (including nullifiers fro
 )
 M[existsOffset] = exists`}
 </CodeBlock>
+- **Details**: The nullifier is expected to be _unsiloed_ if checking for nullifiers from the current transaction and _siloed_ if checking for nullifiers from previous transactions
 - **World State access tracing**: 
 <CodeBlock language="jsx">
 {`context.worldStateAccessTrace.nullifierChecks.append(
@@ -1483,7 +1484,7 @@ M[existsOffset] = exists`}
     }
 )`}
 </CodeBlock>
-- **Triggers downstream circuit operations**: Nullifier siloing (hash with storage contract address), nullifier tree membership check
+- **Triggers downstream circuit operations**: Nullifier tree membership check
 - **Tag updates**: `T[existsOffset] = u8`
 - **Bit-size**: 88
 

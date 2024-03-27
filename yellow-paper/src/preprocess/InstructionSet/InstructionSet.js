@@ -911,7 +911,7 @@ context.worldStateAccessTrace.newNoteHashes.append(
             {"name": "indirect", "description": INDIRECT_FLAG_DESCRIPTION},
         ],
         "Args": [
-            {"name": "nullifierOffset", "description": "memory offset of the unsiloed nullifier"},
+            {"name": "nullifierOffset", "description": "memory offset of the nullifier"},
             {"name": "existsOffset", "description": "memory offset specifying where to store operation's result (whether the nullifier exists)"},
         ],
         "Expression": `
@@ -921,6 +921,7 @@ exists = context.worldState.nullifiers.has(
 M[existsOffset] = exists
 `,
         "Summary": "Check whether a nullifier exists in the nullifier tree (including nullifiers from earlier in the current transaction or from earlier in the current block)",
+        "Details": "The nullifier is expected to be _unsiloed_ if checking for nullifiers from the current transaction and _siloed_ if checking for nullifiers from previous transactions",
         "World State access tracing": `
 context.worldStateAccessTrace.nullifierChecks.append(
     TracedNullifierCheck {
@@ -931,7 +932,7 @@ context.worldStateAccessTrace.nullifierChecks.append(
     }
 )
 `,
-        "Triggers downstream circuit operations": "Nullifier siloing (hash with storage contract address), nullifier tree membership check",
+        "Triggers downstream circuit operations": "Nullifier tree membership check",
         "Tag checks": "",
         "Tag updates": "`T[existsOffset] = u8`",
     },
