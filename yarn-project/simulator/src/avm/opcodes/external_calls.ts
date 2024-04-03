@@ -1,7 +1,10 @@
 import { FunctionSelector } from '@aztec/circuits.js';
 
+import { executePublicFunction } from '../../public/executor.js';
+import { convertPublicExecutionResult, createPublicExecutionContext } from '../../public/transitional_adaptors.js';
 import type { AvmContext } from '../avm_context.js';
 import { Field, Uint8 } from '../avm_memory_types.js';
+import { type AvmContractCallResults } from '../avm_message_call_result.js';
 import { AvmSimulator } from '../avm_simulator.js';
 import { Opcode, OperandType } from '../serialization/instruction_serialization.js';
 import { Addressing } from './addressing_mode.js';
@@ -53,13 +56,19 @@ export class Call extends Instruction {
     const calldata = context.machineState.memory.getSlice(argsOffset, this.argsSize).map(f => f.toFr());
     const functionSelector = context.machineState.memory.getAs<Field>(this.temporaryFunctionSelectorOffset).toFr();
 
+    // TRANSITIONAL: This should be removed once the AVM is fully operational.
     const nestedContext = context.createNestedContractCallContext(
       callAddress.toFr(),
       calldata,
       FunctionSelector.fromField(functionSelector),
     );
+    const [nestedCallResults] = convertPublicExecutionResult(
+      await executePublicFunction(await createPublicExecutionContext(nestedContext), /*nested=*/ true),
+    );
+    // const nestedCallResults: AvmContractCallResults = await new AvmSimulator(nestedContext).execute();
+    // FIXME: state not passed!
+    const nestedPersistableState = nestedContext.persistableState;
 
-    const nestedCallResults = await new AvmSimulator(nestedContext).execute();
     const success = !nestedCallResults.reverted;
 
     // We only take as much data as was specified in the return size -> TODO: should we be reverting here
@@ -71,9 +80,9 @@ export class Call extends Instruction {
     context.machineState.memory.setSlice(retOffset, convertedReturnData);
 
     if (success) {
-      context.persistableState.acceptNestedCallState(nestedContext.persistableState);
+      context.persistableState.acceptNestedCallState(nestedPersistableState);
     } else {
-      context.persistableState.rejectNestedCallState(nestedContext.persistableState);
+      context.persistableState.rejectNestedCallState(nestedPersistableState);
     }
 
     context.machineState.incrementPc();
@@ -122,13 +131,19 @@ export class StaticCall extends Instruction {
     const calldata = context.machineState.memory.getSlice(argsOffset, this.argsSize).map(f => f.toFr());
     const functionSelector = context.machineState.memory.getAs<Field>(this.temporaryFunctionSelectorOffset).toFr();
 
+    // TRANSITIONAL: This should be removed once the AVM is fully operational.
     const nestedContext = context.createNestedContractStaticCallContext(
       callAddress.toFr(),
       calldata,
       FunctionSelector.fromField(functionSelector),
     );
+    const [nestedCallResults] = convertPublicExecutionResult(
+      await executePublicFunction(await createPublicExecutionContext(nestedContext), /*nested=*/ true),
+    );
+    // const nestedCallResults: AvmContractCallResults = await new AvmSimulator(nestedContext).execute();
+    // FIXME: state not passed!
+    const nestedPersistableState = nestedContext.persistableState;
 
-    const nestedCallResults = await new AvmSimulator(nestedContext).execute();
     const success = !nestedCallResults.reverted;
 
     // We only take as much data as was specified in the return size -> TODO: should we be reverting here
@@ -140,9 +155,9 @@ export class StaticCall extends Instruction {
     context.machineState.memory.setSlice(retOffset, convertedReturnData);
 
     if (success) {
-      context.persistableState.acceptNestedCallState(nestedContext.persistableState);
+      context.persistableState.acceptNestedCallState(nestedPersistableState);
     } else {
-      context.persistableState.rejectNestedCallState(nestedContext.persistableState);
+      context.persistableState.rejectNestedCallState(nestedPersistableState);
     }
 
     context.machineState.incrementPc();

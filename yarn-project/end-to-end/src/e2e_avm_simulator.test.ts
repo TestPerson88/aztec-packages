@@ -52,7 +52,15 @@ describe('e2e_avm_simulator', () => {
 
   describe('ACVM interoperability', () => {
     it('Can execute ACVM function among AVM functions', async () => {
-      expect(await avmContact.methods.constant_field_acvm().simulate()).toEqual(123456n);
+      expect(await avmContact.methods.constant_field_acvm().simulate()).toEqual([123456n, 0n, 0n, 0n]);
+    });
+
+    it('Can call AVM function from ACVM', async () => {
+      expect(await avmContact.methods.call_avm_from_acvm().simulate()).toEqual([123456n, 0n, 0n, 0n]);
+    });
+
+    it('Can call ACVM function from AVM', async () => {
+      expect(await avmContact.methods.call_acvm_from_avm().simulate()).toEqual([123456n, 0n, 0n, 0n]);
     });
   });
 });
