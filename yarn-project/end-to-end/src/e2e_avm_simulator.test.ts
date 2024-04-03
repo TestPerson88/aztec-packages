@@ -49,4 +49,10 @@ describe('e2e_avm_simulator', () => {
       // TODO: check NOT reverted
     });
   });
+
+  describe('ACVM interoperability', () => {
+    it('Can execute ACVM function among AVM functions', async () => {
+      expect(await avmContact.methods.constant_field_acvm().simulate()).toEqual(123456n);
+    });
+  });
 });

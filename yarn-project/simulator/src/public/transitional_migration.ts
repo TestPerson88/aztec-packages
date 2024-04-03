@@ -1,4 +1,4 @@
-// All code in this file needs to die once the public executor is phased out.
+// All code in this file needs to die once the public executor is phased out in favor of the AVM.
 import { UnencryptedFunctionL2Logs } from '@aztec/circuit-types';
 import {
   ContractStorageRead,
@@ -11,11 +11,12 @@ import {
 } from '@aztec/circuits.js';
 import { Fr } from '@aztec/foundation/fields';
 
+import { AvmExecutionEnvironment } from '../avm/avm_execution_environment.js';
+import { type AvmContractCallResults } from '../avm/avm_message_call_result.js';
+import { type JournalData } from '../avm/journal/journal.js';
+import { Mov } from '../avm/opcodes/memory.js';
 import { createSimulationError } from '../common/errors.js';
-import { type PublicExecution, type PublicExecutionResult } from '../public/execution.js';
-import { AvmExecutionEnvironment } from './avm_execution_environment.js';
-import { type AvmContractCallResults } from './avm_message_call_result.js';
-import { type JournalData } from './journal/journal.js';
+import { type PublicExecution, type PublicExecutionResult } from './execution.js';
 
 /** Temporary Method
  *
@@ -119,4 +120,15 @@ export function temporaryConvertAvmResults(
     reverted: result.reverted,
     revertReason: result.revertReason ? createSimulationError(result.revertReason) : undefined,
   };
+}
+
+export function isAvmBytecode(bytecode: Buffer): boolean {
+  const magicBuf = Buffer.from([
+    Mov.opcode, // opcode
+    0x00, // indirect
+    ...Buffer.from('000018ca', 'hex'), // srcOffset
+    ...Buffer.from('000018ca', 'hex'), // dstOffset
+  ]);
+  const magicSize = magicBuf.length;
+  return bytecode.subarray(-magicSize).equals(magicBuf);
 }
