@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.33.0](https://github.com/AztecProtocol/aztec-packages/compare/aztec-cli-v0.32.1...aztec-cli-v0.33.0) (2024-04-03)
+
+
+### Bug Fixes
+
+* Update CLI & terraforms with new contract addresses ([#5553](https://github.com/AztecProtocol/aztec-packages/issues/5553)) ([eb73d20](https://github.com/AztecProtocol/aztec-packages/commit/eb73d20e825f3e18acfb68a2b0b7d3501f39e52d))
+
 ## [0.32.1](https://github.com/AztecProtocol/aztec-packages/compare/aztec-cli-v0.32.0...aztec-cli-v0.32.1) (2024-04-02)
 
 
