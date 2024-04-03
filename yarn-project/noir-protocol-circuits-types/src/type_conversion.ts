@@ -391,7 +391,6 @@ export function mapFunctionDataToNoir(functionData: FunctionData): FunctionDataN
   return {
     selector: mapFunctionSelectorToNoir(functionData.selector),
     is_private: functionData.isPrivate,
-    is_transpiled: functionData.isTranspiled,
   };
 }
 
@@ -401,11 +400,7 @@ export function mapFunctionDataToNoir(functionData: FunctionData): FunctionDataN
  * @returns The function data.
  */
 export function mapFunctionDataFromNoir(functionData: FunctionDataNoir): FunctionData {
-  return new FunctionData(
-    mapFunctionSelectorFromNoir(functionData.selector),
-    functionData.is_private,
-    functionData.is_transpiled,
-  );
+  return new FunctionData(mapFunctionSelectorFromNoir(functionData.selector), functionData.is_private);
 }
 
 /**
